@@ -15,6 +15,9 @@ namespace tkd
 {
 
 ///////////////////////////////////////////////////////////////////////////////
+Server* Server::m_instance = nullptr;
+
+///////////////////////////////////////////////////////////////////////////////
 Server::Server(Uint16 port)
     : m_nextId(0)
 {
@@ -81,7 +84,7 @@ void Server::handleNewConnections(void)
     socklen_t len = sizeof(addr);
     Socket socket = ::accept(m_socket, (struct sockaddr*)&addr, &len);
 
-    if (socket = -1)
+    if (socket == -1)
         return;
 
     int id = m_nextId++;
