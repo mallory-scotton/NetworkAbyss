@@ -67,6 +67,8 @@ DEPENDENCIES		=	$(SOURCES:.cpp=.d)
 
 QUIET				?=	0
 
+SFML_COMPILATION	:=	cd External/SFML && cmake . > /dev/null && make -s
+
 ###############################################################################
 ## Makefile rules
 ###############################################################################
@@ -79,7 +81,7 @@ all:
 -include $(DEPENDENCIES)
 
 external:
-	cd External/SFML && cmake . && make
+	@./Scripts/run.sh "$(SFML_COMPILATION)" "SFML-3.0.0"
 
 %.o: %.cpp
 	@./Scripts/progress.sh
@@ -105,7 +107,7 @@ endif
 	@printf "%b" "$(OBJ_COLOR)Flags: 	$(WARN_COLOR)$(MFLAGS)\n\033[m"
 	@echo
 
-setup: header
+setup: header external
 	@./Scripts/setup.sh "$(SOURCES)" "$(EXTENSION)"
 
 build: CXXFLAGS += -MMD -MF $(@:.o=.d)
