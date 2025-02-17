@@ -10,23 +10,36 @@
 ///////////////////////////////////////////////////////////////////////////////
 int main(void)
 {
+    tkd::AssetsPacker packer;
     sf::RenderWindow* window = new sf::RenderWindow(
         sf::VideoMode({800, 600}), "NetworkAbyss", sf::Style::Close
     );
 
+    tkd::States::Base base;
+    base.m_window = window;
+
+    packer.unpack("assets.pak");
+
+    tkd::SPtr<sf::Texture> texture = packer.getTexture("placeholder").value_or(nullptr);
+
+    sf::Sprite sprite(*texture);
+
+    sprite.setPosition({400, 300});
+    sprite.setOrigin({(*texture).getSize().x / 2.f, (*texture).getSize().y / 2.f});
+    sprite.setScale({1.0f, 1.0f});
+    sprite.setTextureRect({{0, 0}, {600, 400}});
+
     while (window->isOpen()) {
         while (const std::optional event = window->pollEvent()) {
-            if (event->is<sf::Event::Closed>()) {
-                window->close();
-            } else if (const auto* key = event->getIf<sf::Event::KeyPressed>()) {
-                if (key->scancode == sf::Keyboard::Scancode::Escape)
-                    window->close();
-            }
+            tkd::OverloadSet set{[&base](const auto& event) { base.handleEvent(event);}};
+            event->visit(set);
         }
 
-        window->display();
-
         window->clear();
+
+        window->draw(sprite);
+
+        window->display();
     }
 
     delete window;
