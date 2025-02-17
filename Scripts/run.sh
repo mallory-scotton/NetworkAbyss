@@ -15,7 +15,7 @@ compiling=`echo "compiling"`
 printf "%b%-46b" "$CO_COLOR$compiling " "$OB_COLOR$2$NO_COLOR"
 
 # Execute the command and parse the log
-$1 2> "$2.log";
+eval "$1" 2> "$2.log" | grep -v '\[.*%\]' | tee -a "$2.log"
 RESULT=$?
 
 # Check the result of the command
@@ -30,7 +30,9 @@ else
 fi
 
 # Print the possible logs
-cat "$2.log"
+if [ -f "$2.log" ]; then
+  cat "$2.log"
+fi
 rm -f "$2.log"
 
 # Exit with the same status has the command
