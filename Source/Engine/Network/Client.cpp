@@ -64,21 +64,21 @@ bool Client::connect(const Address& address)
     if (m_connected)
         this->disconnect();
 
-    m_socket = socket(AF_INET, SOCK_STREAM, 0);
+    m_socket = ::socket(AF_INET, SOCK_STREAM, 0);
     if (m_socket == -1)
         return (false);
 
     sockaddr_in addr;
     addr.sin_family = AF_INET;
     addr.sin_port = address.port;
-    inet_pton(AF_INET, address.ip.c_str(), &addr.sin_addr);
+    ::inet_pton(AF_INET, address.ip.c_str(), &addr.sin_addr);
 
     if (::connect(m_socket, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
         ::close(m_socket);
         return (false);
     }
 
-    fcntl(m_socket, F_SETFL, O_NONBLOCK);
+    ::fcntl(m_socket, F_SETFL, O_NONBLOCK);
 
     m_connected = true;
     return (true);
