@@ -25,26 +25,6 @@ Packet::Packet(Type type)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-Packet::Packet(Type type, const T& data)
-{
-    this->clear();
-    *this << type;
-    *this << data;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-Packet& Packet::operator<<(const T& value)
-{
-    if (m_wpos + sizeof(T) > MAX_SIZE)
-        throw std::out_of_range("Packet write overflow");
-    std::memcpy(m_data.data() + m_wpos, &value, sizeof(T));
-    m_wpos += sizeof(T);
-    return (*this);
-}
-
-///////////////////////////////////////////////////////////////////////////////
 Packet& Packet::operator<<(const String& value)
 {
     *this << static_cast<Uint32>(value.size());
@@ -52,26 +32,6 @@ Packet& Packet::operator<<(const String& value)
         throw std::out_of_range("Packet write overflow");
     std::memcpy(m_data.data() + m_wpos, value.data(), value.size());
     m_wpos += value.size();
-    return (*this);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-Packet& Packet::operator<<(const Vec2<T>& value)
-{
-    *this << value.x;
-    *this << value.y;
-    return (*this);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-Packet& Packet::operator>>(T& value)
-{
-    if (m_rpos + sizeof(T) > MAX_SIZE)
-        throw std::out_of_range("Packet read overflow");
-    std::memcpy(&value, m_data.data() + m_rpos, sizeof(T));
-    m_rpos += sizeof(T);
     return (*this);
 }
 
@@ -84,15 +44,6 @@ Packet& Packet::operator>>(String& value)
         throw std::out_of_range("Packet read overflow");
     value.assign(reinterpret_cast<const char*>(m_data.data() + m_rpos), size);
     m_rpos += size;
-    return (*this);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-template <typename T>
-Packet& Packet::operator>>(Vec2<T>& value)
-{
-    *this >> value.x;
-    *this >> value.y;
     return (*this);
 }
 

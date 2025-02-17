@@ -8,6 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <Engine/Utils/Types.hpp>
 #include <Engine/Utils/Vec2.hpp>
+#include <stdexcept>
+#include <cstring>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Namespace tkd
@@ -75,7 +77,12 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet(Type type, const T& data);
+    Packet(Type type, const T& data)
+    {
+        this->clear();
+        *this << type;
+        *this << data;
+    }
 
 public:
     ///////////////////////////////////////////////////////////////////////////
@@ -89,7 +96,14 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet& operator<<(const T& value);
+    Packet& operator<<(const T& value)
+    {
+        if (m_wpos + sizeof(T) > MAX_SIZE)
+            throw std::out_of_range("Packet write overflow");
+        std::memcpy(m_data.data() + m_wpos, &value, sizeof(T));
+        m_wpos += sizeof(T);
+        return (*this);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
@@ -112,7 +126,12 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet& operator<<(const Vec2<T>& value);
+    Packet& operator<<(const Vec2<T>& value)
+    {
+        *this << value.x;
+        *this << value.y;
+        return (*this);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
@@ -125,7 +144,14 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet& operator>>(T& value);
+    Packet& operator>>(T& value)
+    {
+        if (m_rpos + sizeof(T) > MAX_SIZE)
+            throw std::out_of_range("Packet read overflow");
+        std::memcpy(&value, m_data.data() + m_rpos, sizeof(T));
+        m_rpos += sizeof(T);
+        return (*this);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
@@ -148,7 +174,12 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet& operator>>(Vec2<T>& value);
+    Packet& operator>>(Vec2<T>& value)
+    {
+        *this >> value.x;
+        *this >> value.y;
+        return (*this);
+    }
 
 public:
     ///////////////////////////////////////////////////////////////////////////
