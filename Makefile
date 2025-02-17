@@ -48,6 +48,7 @@ HASH				=
 SOURCE_DIRECTORY	=	Source
 
 SOURCES				=	$(shell find $(SOURCE_DIRECTORY) -name '*.cpp')
+SERVER_SOURCES		=	$(SOURCES)
 
 ###############################################################################
 ## Makefile logic
@@ -71,6 +72,7 @@ WARN_COLOR			=	\033[0;33m
 NO_COLOR			=	\033[m
 
 OBJECTS				=	$(SOURCES:.cpp=.o)
+SERVER_OBJECTS		=	$(SERVER_SOURCES:.cpp=.o)
 
 DEPENDENCIES		=	$(SOURCES:.cpp=.d)
 
@@ -87,7 +89,7 @@ SFML_COMPILATION	:=	cd External/SFML && \
 all:
 	@make QUIET=0 -s build
 	@make QUIET=1 -s server
-	@make QUIET=1 -s packer
+# @make QUIET=1 -s packer
 
 -include $(DEPENDENCIES)
 
