@@ -1,0 +1,49 @@
+# Ignore all
+*
+
+# Unignore all with extensions
+!*.*
+
+# Unigore all dirs
+!*/
+
+# Ignore log
+*.log
+
+# Builded objects
+build/
+*.d
+*.o
+*.a
+*.so
+*.dll
+.build
+
+# Configuration file
+*.ini
+*.env
+
+# Do not push the assets
+assets/
+*.pak
+
+# Unit tests files
+*.gcda
+*.gcno
+
+# IDE related folders
+.idea/
+.vscode/
+
+# Ignore root tests files
+/*.cpp
+/*.hpp
+/*.inl
+/*.h
+/*.c
+
+# Unignore Makefile
+!Makefile
+
+# Unignore AUTHORS
+!AUTHORS
