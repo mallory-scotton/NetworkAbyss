@@ -9,4 +9,10 @@
 namespace tkd::States
 {
 
+///////////////////////////////////////////////////////////////////////////////
+void Base::handleEvent(const sf::Event::Closed&)
+{
+    m_window->close();
+}
+
 } // namespace tkd::States
