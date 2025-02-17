@@ -39,7 +39,7 @@ template <typename T> using Optional = std::optional<T>;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T> using SharedPtr = std::shared_ptr<T>;
-template <typename T> using SPtr = std::unique_ptr<T>;
+template <typename T> using SPtr = std::shared_ptr<T>;
 
 ///////////////////////////////////////////////////////////////////////////////
 template <typename T> using UniquePtr = std::unique_ptr<T>;
