@@ -34,57 +34,212 @@ public:
     /// \brief
     ///
     ///////////////////////////////////////////////////////////////////////////
-    enum class Type : int
+    struct Connect
     {
-        Connect,            //<!
-        Disconnect,         //<!
-        PlayerMove,         //<!
-        PlayerList,         //<!
-        PlayerJoined,       //<!
-        PlayerLeft          //<!
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    struct Disconnect
+    {
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    struct PlayerMove
+    {
+        Vec2f position{0.f};
+        int id{-1};
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    struct PlayerList
+    {
+        Uint32 count{0};
+        UMap<int, Vec2f> players{};
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    struct PlayerJoined
+    {
+        int id{-1};
+    };
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    struct PlayerLeft
+    {
+        int id{-1};
     };
 
 private:
     ///////////////////////////////////////////////////////////////////////////
     //
     ///////////////////////////////////////////////////////////////////////////
-    Array<Byte, MAX_SIZE> m_data;       //<!
-    Uint64 m_rpos = 0;                  //<!
-    Uint64 m_wpos = 0;                  //<!
+    Variant<
+        Connect,
+        Disconnect,
+        PlayerMove,
+        PlayerList,
+        PlayerJoined,
+        PlayerLeft
+    > m_data;                           //<!
+    Array<Byte, MAX_SIZE> m_buffer;     //<!
+    Uint64 m_pos = 0;                   //<!
 
-public:
+private:
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
     ///
-    ///////////////////////////////////////////////////////////////////////////
-    Packet(void);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief
+    /// \tparam T
+    /// \tparam Ts
     ///
-    /// \param type
+    /// \param
+    ///
+    /// \return
     ///
     ///////////////////////////////////////////////////////////////////////////
-    Packet(Type type);
+    template <typename T, typename... Ts>
+    static constexpr bool isInParameterPack(const Variant<Ts...>*)
+    {
+        return (std::disjunction_v<std::is_same<T, Ts>...>);
+    }
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
     ///
     /// \tparam T
     ///
-    /// \param type
-    /// \param data
+    /// \param
+    ///
+    /// \return
     ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet(Type type, const T& data)
-    {
-        this->clear();
-        *this << type;
-        *this << data;
-    }
+    static constexpr bool isPacketSubType = isInParameterPack<T>(
+        decltype(&m_data)(nullptr)
+    );
 
 public:
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    Packet(void) = default;
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \tparam T
+    ///
+    /// \param subType
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    explicit Packet(const T& subType)
+    {
+        static_assert(isPacketSubType<T>, "T must be a subtype of Packet");
+        if constexpr (isPacketSubType<T>) {
+            m_data = subType;
+            this->serialize();
+        }
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \tparam T
+    ///
+    /// \return
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    bool is(void) const
+    {
+        static_assert(isPacketSubType<T>, "T must be a subtype of Packet");
+        if constexpr (isPacketSubType<T>)
+            return (std::holds_alternative<T>(m_data));
+        return (false);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \tparam T
+    ///
+    /// \return
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    T* getIf(void)
+    {
+        static_assert(isPacketSubType<T>, "T must be a subtype of Packet");
+        if constexpr (isPacketSubType<T>)
+            return (std::get_if<T>(&m_data));
+        return (nullptr);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \tparam T
+    ///
+    /// \return
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    const T* getIf(void) const
+    {
+        static_assert(isPacketSubType<T>, "T must be a subtype of Packet");
+        if constexpr (isPacketSubType<T>)
+            return (std::get_if<T>(&m_data));
+        return (nullptr);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \tparam Visitor
+    ///
+    /// \param visitor
+    ///
+    /// \return
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Visitor>
+    decltype(auto) visit(Visitor&& visitor)
+    {
+        return (std::visit(std::forward<Visitor>(visitor), m_data));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \tparam Visitor
+    ///
+    /// \param visitor
+    ///
+    /// \return
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename Visitor>
+    decltype(auto) visit(Visitor&& visitor) const
+    {
+        return (std::visit(std::forward<Visitor>(visitor), m_data));
+    }
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
     ///
@@ -92,45 +247,14 @@ public:
     ///
     /// \param value
     ///
-    /// \return
-    ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet& operator<<(const T& value)
+    void write(const T& value)
     {
-        if (m_wpos + sizeof(T) > MAX_SIZE)
+        if (m_pos + sizeof(T) > MAX_SIZE)
             throw std::out_of_range("Packet write overflow");
-        std::memcpy(m_data.data() + m_wpos, &value, sizeof(T));
-        m_wpos += sizeof(T);
-        return (*this);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief
-    ///
-    /// \param value
-    ///
-    /// \return
-    ///
-    ///////////////////////////////////////////////////////////////////////////
-    Packet& operator<<(const String& value);
-
-    ///////////////////////////////////////////////////////////////////////////
-    /// \brief
-    ///
-    /// \tparam T
-    ///
-    /// \param value
-    ///
-    /// \return
-    ///
-    ///////////////////////////////////////////////////////////////////////////
-    template <typename T>
-    Packet& operator<<(const Vec2<T>& value)
-    {
-        *this << value.x;
-        *this << value.y;
-        return (*this);
+        std::memcpy(m_buffer.data() + m_pos, &value, sizeof(T));
+        m_pos += sizeof(T);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -140,17 +264,14 @@ public:
     ///
     /// \param value
     ///
-    /// \return
-    ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet& operator>>(T& value)
+    void read(T& value)
     {
-        if (m_rpos + sizeof(T) > MAX_SIZE)
+        if (m_pos + sizeof(T) > MAX_SIZE)
             throw std::out_of_range("Packet read overflow");
-        std::memcpy(&value, m_data.data() + m_rpos, sizeof(T));
-        m_rpos += sizeof(T);
-        return (*this);
+        std::memcpy(&value, m_buffer.data() + m_pos, sizeof(T));
+        m_pos += sizeof(T);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -158,10 +279,8 @@ public:
     ///
     /// \param value
     ///
-    /// \return
-    ///
     ///////////////////////////////////////////////////////////////////////////
-    Packet& operator>>(String& value);
+    void write(const String& value);
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
@@ -170,18 +289,53 @@ public:
     ///
     /// \param value
     ///
-    /// \return
+    ///////////////////////////////////////////////////////////////////////////
+    template <typename T>
+    void write(const Vec2<T>& value)
+    {
+        this->write(value.x);
+        this->write(value.y);
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \param value
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    void write(const PlayerList& value);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \param value
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    void read(String& value);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \tparam T
+    ///
+    /// \param value
     ///
     ///////////////////////////////////////////////////////////////////////////
     template <typename T>
-    Packet& operator>>(Vec2<T>& value)
+    void read(Vec2<T>& value)
     {
-        *this >> value.x;
-        *this >> value.y;
-        return (*this);
+        this->read(value.x);
+        this->read(value.y);
     }
 
-public:
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    /// \param value
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    void read(PlayerList& value);
+
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
     ///
@@ -211,6 +365,18 @@ public:
     ///
     ///////////////////////////////////////////////////////////////////////////
     void clear(void);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    void serialize(void);
+
+    ///////////////////////////////////////////////////////////////////////////
+    /// \brief
+    ///
+    ///////////////////////////////////////////////////////////////////////////
+    void deserialize(void);
 };
 
 } // namespace tkd

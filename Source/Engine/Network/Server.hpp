@@ -29,8 +29,8 @@ private:
     ///////////////////////////////////////////////////////////////////////////
     struct ClientInfo
     {
-        Socket socket;      //<!
-        Vec2f position;     //<!
+        Socket socket;                      //<!
+        Vec2f position;                     //<!
     };
 
 private:

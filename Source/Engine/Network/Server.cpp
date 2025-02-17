@@ -51,7 +51,7 @@ Server::Server(Uint16 port)
 ///////////////////////////////////////////////////////////////////////////////
 Server::~Server()
 {
-    this->broadcast(Packet(Packet::Type::Disconnect));
+    this->broadcast(Packet());
 
     for (const auto& client : m_clients)
         ::close(client.second->socket);
@@ -75,7 +75,9 @@ void Server::run(void)
 
 ///////////////////////////////////////////////////////////////////////////////
 void Server::update(void)
-{}
+{
+    this->broadcast(Packet{Packet::PlayerMove{{42.f}, 5}});
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 void Server::handleNewConnections(void)
@@ -92,22 +94,18 @@ void Server::handleNewConnections(void)
     ::fcntl(socket, F_SETFL, O_NONBLOCK);
 
     {
-        Packet packet(Packet::Type::PlayerList);
-
-        packet << m_clients.size();
+        Packet::PlayerList playerList;
+        playerList.count = m_clients.size();
         for (const auto& client : m_clients)
-            packet << client.first << client.second->position;
+            playerList.players[client.first] = client.second->position;
+        Packet packet(playerList);
+
         ::send(socket, packet.data(), packet.size(), 0);
     }
 
     m_clients[id] = std::make_unique<ClientInfo>(socket, Vec2f(0.f));
 
-    {
-        Packet packet(Packet::Type::PlayerJoined);
-
-        packet << id << Vec2f(0.f);
-        this->broadcast(packet, socket);
-    }
+    this->broadcast(Packet{Packet::PlayerJoined{id}}, socket);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,24 +121,13 @@ void Server::handleClientMessages(void)
         );
 
         if (res > 0) {
-            Packet::Type type;
-            Packet result;
+            packet.deserialize();
 
-            packet >> type;
-            result << type;
-
-            switch (type) {
-                case Packet::Type::PlayerMove:
-                {
-                    packet >> m_clients[it->first]->position;
-                    result << it->first << m_clients[it->first]->position;
-                    this->broadcast(result, m_clients[it->first]->socket);
-                    break;
-                }
-                default:
-                {
-                    break;
-                }
+            if (const auto* move = packet.getIf<Packet::PlayerMove>()) {
+                this->broadcast(
+                    Packet(Packet::PlayerMove{move->position, it->first}),
+                    m_clients[it->first]->socket
+                );
             }
 
             ++it;
@@ -161,7 +148,7 @@ void Server::handleDisconnections(Map<int, UPtr<ClientInfo>>::iterator it)
     int id = it->first;
 
     ::close(it->second->socket);
-    this->broadcast(Packet(Packet::Type::PlayerLeft, id), it->second->socket);
+    this->broadcast(Packet{Packet::PlayerLeft{id}}, it->second->socket);
     m_clients.erase(it);
 }
 
@@ -169,8 +156,9 @@ void Server::handleDisconnections(Map<int, UPtr<ClientInfo>>::iterator it)
 void Server::broadcast(const Packet& packet, Socket socket)
 {
     for (const auto& client : m_clients) {
-        if (client.second->socket != socket)
+        if (client.second->socket != socket) {
             send(client.second->socket, packet.data(), packet.size(), 0);
+        }
     }
 }
 

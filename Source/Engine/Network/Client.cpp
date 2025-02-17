@@ -73,10 +73,12 @@ bool Client::connect(const Address& address)
 
     sockaddr_in addr;
     addr.sin_family = AF_INET;
-    addr.sin_port = address.port;
-    ::inet_pton(AF_INET, address.ip.c_str(), &addr.sin_addr);
+    addr.sin_port = ::htons(address.port);
 
-    if (::connect(m_socket, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+    if (
+        ::inet_pton(AF_INET, address.ip.c_str(), &addr.sin_addr) <= 0 ||
+        ::connect(m_socket, (struct sockaddr*)&addr, sizeof(addr)) == -1
+    ) {
         ::close(m_socket);
         return (false);
     }
@@ -113,8 +115,10 @@ Optional<Packet> Client::pollPacket(void)
         return (std::nullopt);
 
     Packet packet;
-    if (::recv(m_socket, packet.data(), packet.MAX_SIZE, 0) > 0)
+    if (::recv(m_socket, packet.data(), packet.MAX_SIZE, 0) > 0) {
+        packet.deserialize();
         return (packet);
+    }
 
     return (std::nullopt);
 }
