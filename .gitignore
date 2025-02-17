@@ -25,7 +25,6 @@ build/
 
 # Do not push the assets
 assets/
-*.pak
 
 # Unit tests files
 *.gcda
