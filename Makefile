@@ -5,20 +5,29 @@
 CXX					=	g++
 
 CXXFLAGS			=	-std=c++20 -Wall -Wextra \
-						-IExternal/SFML/include -ISource \
-						-lGL \
-						-lz \
-						-lm \
-						-LExternal/SFML/lib \
+						-IExternal/SFML/include \
+						-ISource \
+						-DSFML_STATIC \
+						-LExternal/SFML/build/lib \
+						-lsfml-audio-s \
 						-lsfml-graphics-s \
 						-lsfml-window-s \
 						-lsfml-system-s \
+						-lGL \
+						-lz \
+						-lm \
 						-lX11 \
 						-lXrandr \
 						-lXcursor \
 						-lXinerama \
 						-ludev \
-						-lXi
+						-lXi \
+						-lfreetype \
+						-lFLAC \
+						-logg \
+						-lvorbis \
+						-lvorbisfile \
+						-lvorbisenc
 
 TARGET				=	network-abyss
 SERVER_TARGET		=	network-abyss-server
@@ -67,7 +76,9 @@ DEPENDENCIES		=	$(SOURCES:.cpp=.d)
 
 QUIET				?=	0
 
-SFML_COMPILATION	:=	cd External/SFML && cmake . > /dev/null && make -s
+SFML_COMPILATION	:=	cd External/SFML && \
+						cmake -S . -B build -DBUILD_SHARED_LIBS=OFF \
+						> /dev/null && cmake --build build > /dev/null
 
 ###############################################################################
 ## Makefile rules
