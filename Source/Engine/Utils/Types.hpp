@@ -55,4 +55,7 @@ typedef signed short Int16;
 typedef signed int Int32;
 typedef signed long Int64;
 
+///////////////////////////////////////////////////////////////////////////////
+typedef int Socket;
+
 } // namespace tkd
