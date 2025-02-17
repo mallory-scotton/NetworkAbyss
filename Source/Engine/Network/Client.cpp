@@ -2,6 +2,11 @@
 // Dependencies
 ///////////////////////////////////////////////////////////////////////////////
 #include <Engine/Network/Client.hpp>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Namespace tkd
@@ -12,7 +17,7 @@ namespace tkd
 ///////////////////////////////////////////////////////////////////////////////
 Client::Client(void)
     : m_connected(false)
-    , m_socket(INVALID_SOCKET_VALUE)
+    , m_socket(-1)
 {
     if (Client::m_instance)
         delete Client::m_instance;
@@ -22,7 +27,7 @@ Client::Client(void)
 ///////////////////////////////////////////////////////////////////////////////
 Client::~Client()
 {
-    if (this->m_connected)
+    if (m_connected)
         this->disconnect();
 }
 
@@ -56,11 +61,11 @@ Client* Client::getInstance(void)
 ///////////////////////////////////////////////////////////////////////////////
 bool Client::connect(const Address& address)
 {
-    if (this->m_connected)
+    if (m_connected)
         this->disconnect();
 
-    this->m_socket = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->m_socket == INVALID_SOCKET_VALUE)
+    m_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (m_socket == -1)
         return (false);
 
     sockaddr_in addr;
@@ -68,53 +73,44 @@ bool Client::connect(const Address& address)
     addr.sin_port = address.port;
     inet_pton(AF_INET, address.ip.c_str(), &addr.sin_addr);
 
-    if (::connect(
-            this->m_socket,
-            (struct sockaddr*)&addr,
-            sizeof(addr)
-        ) == SOCKET_ERROR_VALUE) {
-        closesocket(this->m_socket);
+    if (::connect(m_socket, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+        ::close(m_socket);
         return (false);
     }
 
-#ifdef _WIN32
-    u_long mode = 1;
-    ioctlsocket(this->m_socket, FIONBIO, &mode);
-#else
-    fcntl(this->m_socket, F_SETFL, O_NONBLOCK);
-#endif
+    fcntl(m_socket, F_SETFL, O_NONBLOCK);
 
-    this->m_connected = true;
+    m_connected = true;
     return (true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 void Client::disconnect(void)
 {
-    if (this->m_connected) {
-        this->m_connected = false;
-        closesocket(this->m_socket);
-        m_socket = INVALID_SOCKET_VALUE;
+    if (m_connected) {
+        m_connected = false;
+        ::close(m_socket);
+        m_socket = -1;
     }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 bool Client::send(const Packet& packet) const
 {
-    if (this->m_connected)
+    if (m_connected)
         return (false);
-    ::send(this->m_socket, packet.data(), packet.size(), 0);
+    ::send(m_socket, packet.data(), packet.size(), 0);
     return (true);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 Optional<Packet> Client::pollPacket(void)
 {
-    if (!this->m_connected)
+    if (!m_connected)
         return (std::nullopt);
 
     Packet packet;
-    if (::recv(this->m_socket, packet.data(), packet.MAX_SIZE, 0) > 0)
+    if (::recv(m_socket, packet.data(), packet.MAX_SIZE, 0) > 0)
         return (packet);
 
     return (std::nullopt);
