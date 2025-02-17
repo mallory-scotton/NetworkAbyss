@@ -11,8 +11,11 @@ NO_COLOR="\033[m"
 # Text constant
 compiling=`echo "compiling"`
 
+# Get the filename without extension and path
+filename=$(basename "$2")
+
 # Print fthe current object
-printf "%b%-46b" "$CO_COLOR$compiling " "$OB_COLOR$2$NO_COLOR"
+printf "%b%-46b" "$CO_COLOR$compiling " "$OB_COLOR$filename$NO_COLOR"
 
 # Execute the command and parse the log
 eval "$1" 2> "$2.log" | grep -v '\[.*%\]' | tee -a "$2.log"
