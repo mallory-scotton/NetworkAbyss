@@ -84,6 +84,7 @@ public:
     void handlePacket(const Packet::PlayerList&) {};
     void handlePacket(const Packet::PlayerJoined&) {};
     void handlePacket(const Packet::PlayerLeft&) {};
+    template <typename T> void handlePacket(const T&) {};
 
     ///////////////////////////////////////////////////////////////////////////
     /// \brief
@@ -121,6 +122,7 @@ public:
     virtual void handleEvent(const sf::Event::TouchMoved&) {};
     virtual void handleEvent(const sf::Event::TouchEnded&) {};
     virtual void handleEvent(const sf::Event::SensorChanged&) {};
+    template <typename T> void handleEvent(const T&) {};
 };
 
 } // namespace tkd::States
