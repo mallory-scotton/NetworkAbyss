@@ -48,7 +48,16 @@ HASH				=
 SOURCE_DIRECTORY	=	Source
 
 SOURCES				=	$(shell find $(SOURCE_DIRECTORY) -name '*.cpp')
-SERVER_SOURCES		=	$(SOURCES)
+
+SERVER_SOURCES		=	Source/Engine/Network/Network.cpp \
+						Source/Engine/Network/Packet.cpp \
+						Source/Engine/Network/Server.cpp \
+						Source/Engine/Network/ServerDiscovery.cpp \
+						Source/Main.cpp
+
+PACKER_SOURCES		=	Source/Engine/Resources/AssetsPacker.cpp \
+						Source/Engine/Resources/Compressor.cpp \
+						Source/Main.cpp
 
 ###############################################################################
 ## Makefile logic
@@ -73,6 +82,7 @@ NO_COLOR			=	\033[m
 
 OBJECTS				=	$(SOURCES:.cpp=.o)
 SERVER_OBJECTS		=	$(SERVER_SOURCES:.cpp=.o)
+PACKER_OBJECTS		=	$(PACKER_SOURCES:.cpp=.o)
 
 DEPENDENCIES		=	$(SOURCES:.cpp=.d)
 
@@ -89,7 +99,7 @@ SFML_COMPILATION	:=	cd External/SFML && \
 all:
 	@make QUIET=0 -s build
 	@make QUIET=1 -s server
-# @make QUIET=1 -s packer
+	@make QUIET=1 -s packer
 
 -include $(DEPENDENCIES)
 
