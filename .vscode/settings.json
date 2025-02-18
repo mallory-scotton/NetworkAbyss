@@ -1,0 +1,11 @@
+{
+  "files.exclude": {
+    "**/*.o": true,
+    "**/*.d": true
+  },
+  "C_Cpp.default.includePath": [
+    "${workspaceFolder}/**",
+    "${workspaceFolder}/External/SFML/include",
+    "/usr/include"
+  ]
+}
