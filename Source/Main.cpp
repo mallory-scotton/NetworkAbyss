@@ -64,6 +64,69 @@ int main(void)
     return (EXIT_SUCCESS);
 }
 
+#elif defined(NEON_PACKER)
+
+///////////////////////////////////////////////////////////////////////////////
+// Dependencies
+///////////////////////////////////////////////////////////////////////////////
+#include <sstream>
+#include <unistd.h>
+
+///////////////////////////////////////////////////////////////////////////////
+int main(void)
+{
+    tkd::AssetsPacker packer;
+    std::string command;
+
+    bool isTerminal = isatty(fileno(stdin));
+
+    while (true) {
+        if (isTerminal)
+            std::cout << "packer> ";
+        std::getline(std::cin, command);
+
+        if (std::cin.eof())
+            break;
+
+        std::istringstream iss(command);
+        std::string token;
+        iss >> token;
+
+        if (token == "pack" || token == "p") {
+            std::string filename;
+            if (iss >> filename)
+                packer.pack(filename);
+            else std::cout << "Usage: pack <filename>" << std::endl;
+        } else if (token == "unpack" || token == "u") {
+            std::string filename;
+            if (iss >> filename)
+                try { packer.unpack(filename); }
+                catch (const std::exception& e) {}
+            else std::cout << "Usage: unpack <filename>" << std::endl;
+        } else if (token == "add" || token == "a") {
+            std::string filename;
+            std::string key;
+            if (iss >> filename >> key) {
+                try {
+                    packer.addAsset(key, filename);
+                } catch (const std::exception& error) {
+                    std::cout << "Error: " << error.what() << std::endl;
+                }
+            } else std::cout << "Usage: add <filename> <key>" << std::endl;
+        } else if (token == "display" || token == "d") {
+            std::cout << packer;
+        } else if (token == "clear") {
+            packer.clear();
+        }  else if (token == "quit" || token == "q") {
+            break;
+        } else {
+            std::cout << "Unknown command: " << token << std::endl;
+        }
+    }
+
+    return (EXIT_SUCCESS);
+}
+
 #else
 
 ///////////////////////////////////////////////////////////////////////////////
