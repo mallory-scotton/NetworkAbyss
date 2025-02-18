@@ -20,7 +20,7 @@ namespace tkd
 const Uint16 ServerDiscovery::DISCOVERY_PORT = 55000;
 
 ///////////////////////////////////////////////////////////////////////////////
-const char* ServerDiscovery::DISCOVERY_MESSAGE = "TKD_NETWORKABYSS_SERV";
+const String ServerDiscovery::DISCOVERY_MESSAGE = "TKD_NETWORKABYSS_SERV";
 
 ///////////////////////////////////////////////////////////////////////////////
 ServerDiscovery::ServerDiscovery(Uint16 port)
@@ -60,7 +60,7 @@ void ServerDiscovery::startBroadcasting(void)
         addr.sin_port = htons(DISCOVERY_PORT);
         addr.sin_addr.s_addr = INADDR_BROADCAST;
 
-        String messsage = DISCOVERY_MESSAGE;
+        String messsage = DISCOVERY_MESSAGE + ':';
         messsage += std::to_string(m_port);
 
         while (m_running) {
@@ -122,7 +122,7 @@ void ServerDiscovery::startListening(ServerDiscovery::Callback callback)
 
                 if (
                     ::sscanf(buffer, "%[^:]:%d", msg, &port) == 2 &&
-                    ::strcmp(msg, DISCOVERY_MESSAGE) == 0
+                    msg == DISCOVERY_MESSAGE
                 ) {
                     char ip[INET_ADDRSTRLEN];
                     ::inet_ntop(AF_INET, &(saddr.sin_addr), ip,
