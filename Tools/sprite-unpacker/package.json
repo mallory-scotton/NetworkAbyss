@@ -1,0 +1,29 @@
+{
+  "name": "sprite-unpacker",
+  "version": "1.0.0",
+  "author": "mallory-scotton",
+  "description": "Little tools to unpack Unity sprites based on a folders",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts"
+  },
+  "keywords": [
+    "unity",
+    "sprite",
+    "assets"
+  ],
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "canvas": "^3.1.0",
+    "fs": "0.0.1-security",
+    "path": "^0.12.7",
+    "ts-progress": "^0.1.9",
+    "yaml": "^2.7.0"
+  }
+}
