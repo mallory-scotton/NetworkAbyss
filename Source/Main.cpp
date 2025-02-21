@@ -75,10 +75,13 @@ int main(void)
 ///////////////////////////////////////////////////////////////////////////////
 int main(void)
 {
-    tkd::AssetsPacker packer;
+    tkd::AssetsPacker packer(Z_BEST_COMPRESSION);
     std::string command;
 
     bool isTerminal = isatty(fileno(stdin));
+
+    try { packer.unpack("assets.pak"); }
+    catch (const std::exception&) {}
 
     while (true) {
         if (isTerminal)
@@ -135,7 +138,7 @@ int main(void)
     tkd::Engine engine(
         {800, 600},
         "NetworkAbyss",
-        std::make_unique<tkd::States::Discovery>()
+        std::make_unique<tkd::States::Menu>()
     );
 
     engine.run();
