@@ -14,7 +14,8 @@ namespace tkd::States
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-void Discovery::init(void)
+Discovery::Discovery(void)
+    : Base()
 {
     m_discovery.startListening([this](const Address& address) {
         if (std::find(
@@ -29,6 +30,12 @@ void Discovery::init(void)
     m_shape.setSize({200.f, 50.f});
     m_shape.setOrigin({100.f, 25.f});
     m_shape.setFillColor(sf::Color::Green);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+Discovery::~Discovery()
+{
+    m_discovery.stop();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
