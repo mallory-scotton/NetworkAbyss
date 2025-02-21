@@ -49,4 +49,10 @@ sf::RenderWindow& Renderer::getWindow(void)
     return (m_window);
 }
 
+///////////////////////////////////////////////////////////////////////////////
+sf::View& Renderer::getView(void)
+{
+    return (m_view);
+}
+
 } // namespace tkd

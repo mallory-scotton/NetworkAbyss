@@ -10,9 +10,6 @@ namespace tkd
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-AssetsManager* AssetsManager::m_instance = nullptr;
-
-///////////////////////////////////////////////////////////////////////////////
 AssetsManager::AssetsManager(const String& assets)
     : m_packer(Z_BEST_COMPRESSION)
 {
@@ -21,17 +18,6 @@ AssetsManager::AssetsManager(const String& assets)
     } catch (const std::exception& error) {
         std::cerr << "Assets: " << error.what() << std::endl;
     }
-    if (AssetsManager::m_instance)
-        delete AssetsManager::m_instance;
-    AssetsManager::m_instance = this;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-AssetsManager* AssetsManager::getInstance(void)
-{
-    if (!AssetsManager::m_instance)
-        AssetsManager::m_instance = new AssetsManager();
-    return (AssetsManager::m_instance);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

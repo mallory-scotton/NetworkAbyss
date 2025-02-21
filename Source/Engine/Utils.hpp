@@ -8,5 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 #include <Engine/Utils/Constants.hpp>
 #include <Engine/Utils/Macros.hpp>
+#include <Engine/Utils/Singleton.hpp>
 #include <Engine/Utils/Types.hpp>
 #include <Engine/Utils/Vec2.hpp>

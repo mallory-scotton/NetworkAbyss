@@ -15,16 +15,9 @@ namespace tkd
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-Server* Server::m_instance = nullptr;
-
-///////////////////////////////////////////////////////////////////////////////
 Server::Server(Uint16 port)
     : m_nextId(0)
 {
-    if (Server::m_instance)
-        delete Server::m_instance;
-    Server::m_instance = this;
-
     m_socket = ::socket(AF_INET, SOCK_STREAM, 0);
 
     if (m_socket == -1)
@@ -56,14 +49,6 @@ Server::~Server()
     for (const auto& client : m_clients)
         ::close(client.second->socket);
     ::close(m_socket);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-Server* Server::getInstance(Uint16 port)
-{
-    if (!Server::m_instance)
-        Server::m_instance = new Server(port);
-    return (Server::m_instance);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
