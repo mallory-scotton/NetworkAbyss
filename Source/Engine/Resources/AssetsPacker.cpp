@@ -43,7 +43,7 @@ AssetsPacker& AssetsPacker::operator<<(const Pair<String, Path>& entry)
         throw std::runtime_error("Cannot open file: " + filepath.string());
 
     Data raw = Data(std::istreambuf_iterator<char>(file), {});
-    Data data = Compressor::compress(raw);
+    Data data = Compressor::compress(raw, m_compressionLevel);
 
     Assets asset{data, raw.size(), data.size(), type};
 
