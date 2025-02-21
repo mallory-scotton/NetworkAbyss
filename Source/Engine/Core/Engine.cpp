@@ -2,6 +2,7 @@
 // Dependencies
 ///////////////////////////////////////////////////////////////////////////////
 #include <Engine/Core/Engine.hpp>
+#include <Engine/Resources/AssetsManager.hpp>
 
 ///////////////////////////////////////////////////////////////////////////////
 // Namespace tkd
@@ -18,6 +19,7 @@ Engine::Engine(
     : m_renderer(dimension, title)
     , m_stateManager(&m_renderer.getWindow())
 {
+    AssetsManager::getInstance();
     m_stateManager.push(std::move(state));
 }
 
@@ -39,6 +41,8 @@ void Engine::run(void)
         if (m_stateManager.empty())
             m_renderer.getWindow().close();
     }
+
+    delete AssetsManager::getInstance();
 }
 
 } // namespace tkd
