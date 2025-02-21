@@ -20,7 +20,8 @@ void StateManager::push(State state)
 {
     state->m_stateManager = this;
     state->m_window = m_window;
-    state->init();
+    if (!m_states.empty())
+        m_states.top()->onStateChange();
     m_states.push(std::move(state));
 }
 
@@ -29,6 +30,8 @@ void StateManager::pop(void)
 {
     if (!m_states.empty())
         m_states.pop();
+    if (!m_states.empty())
+        m_states.top()->onStateFocus();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
