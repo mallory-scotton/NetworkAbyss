@@ -6,9 +6,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Dependencies
 ///////////////////////////////////////////////////////////////////////////////
-#include <Engine/Core.hpp>
-#include <Engine/Inputs.hpp>
-#include <Engine/Items.hpp>
-#include <Engine/Network.hpp>
-#include <Engine/Resources.hpp>
-#include <Engine/Utils.hpp>
+#include <Engine/Inputs/ControllerAxisBinding.hpp>
+#include <Engine/Inputs/ControllerButtonBinding.hpp>
+#include <Engine/Inputs/GameAction.hpp>
+#include <Engine/Inputs/InputBinding.hpp>
+#include <Engine/Inputs/InputManager.hpp>
+#include <Engine/Inputs/KeyBinding.hpp>
+#include <Engine/Inputs/MouseBinding.hpp>
