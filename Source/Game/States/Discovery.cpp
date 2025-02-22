@@ -49,7 +49,7 @@ void Discovery::render(void)
 {
     for (Uint64 i = 0; i < m_addresses.size(); i++) {
         m_shape.setPosition({400.f, 50.f + 75.f * (float)i});
-        m_window->draw(m_shape);
+        m_renderer->draw(m_shape);
     }
 }
 

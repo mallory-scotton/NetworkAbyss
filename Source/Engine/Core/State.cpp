@@ -10,9 +10,15 @@ namespace tkd::States
 {
 
 ///////////////////////////////////////////////////////////////////////////////
+Base::Base(void)
+    : m_renderer(Renderer::getInstance())
+    , m_stateManager(StateManager::getInstance())
+{}
+
+///////////////////////////////////////////////////////////////////////////////
 void Base::handleEvent(const sf::Event::Closed&)
 {
-    m_window->close();
+    m_renderer->getWindow().close();
 }
 
 } // namespace tkd::States

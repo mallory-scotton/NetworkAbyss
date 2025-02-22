@@ -39,7 +39,10 @@ public:
     /// \param title
     ///
     ///////////////////////////////////////////////////////////////////////////
-    Renderer(const Vec2u& dimension, const String& title);
+    Renderer(
+        const Vec2u& dimension = {800, 600},
+        const String& title = "NetworkAbyss"
+    );
 
 public:
     ///////////////////////////////////////////////////////////////////////////

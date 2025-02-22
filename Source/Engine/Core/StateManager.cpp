@@ -11,15 +11,13 @@ namespace tkd
 {
 
 ///////////////////////////////////////////////////////////////////////////////
-StateManager::StateManager(sf::RenderWindow* window)
-    : m_window(window)
+StateManager::StateManager(void)
+    : m_renderer(Renderer::getInstance())
 {}
 
 ///////////////////////////////////////////////////////////////////////////////
 void StateManager::push(State state)
 {
-    state->m_stateManager = this;
-    state->m_window = m_window;
     if (!m_states.empty())
         m_states.top()->onStateChange();
     m_states.push(std::move(state));
@@ -51,7 +49,7 @@ void StateManager::handleEvents(void)
         m_states.top()->handleEvent(event);
     }};
 
-    while (const Optional<sf::Event> event = m_window->pollEvent())
+    while (const auto event = m_renderer->getWindow().pollEvent())
         event->visit(set);
 }
 

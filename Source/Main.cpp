@@ -135,11 +135,7 @@ int main(void)
 ///////////////////////////////////////////////////////////////////////////////
 int main(void)
 {
-    tkd::Engine engine(
-        {800, 600},
-        "NetworkAbyss",
-        std::make_unique<tkd::States::Menu>()
-    );
+    tkd::Engine engine;
 
     engine.run();
 
