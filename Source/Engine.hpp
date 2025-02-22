@@ -7,6 +7,7 @@
 // Dependencies
 ///////////////////////////////////////////////////////////////////////////////
 #include <Engine/Core.hpp>
+#include <Engine/Items.hpp>
 #include <Engine/Network.hpp>
 #include <Engine/Resources.hpp>
 #include <Engine/Utils.hpp>
