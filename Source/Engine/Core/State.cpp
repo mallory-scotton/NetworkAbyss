@@ -18,7 +18,7 @@ Base::Base(void)
 ///////////////////////////////////////////////////////////////////////////////
 void Base::handleEvent(const sf::Event::Closed&)
 {
-    m_renderer->getWindow().close();
+    m_renderer->close();
 }
 
 } // namespace tkd::States

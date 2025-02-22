@@ -39,7 +39,7 @@ Menu::~Menu()
 void Menu::update(float deltaT)
 {
     UNUSED(deltaT);
-    m_sprite.setPosition(Vec2f(m_renderer->getWindow().getSize()) / 2.f);
+    m_sprite.setPosition(m_renderer->getSize() / 2.f);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,7 +64,7 @@ void Menu::onStateFocus(void)
 void Menu::handleEvent(const sf::Event::KeyPressed& key)
 {
     if (key.scancode == sf::Keyboard::Scancode::Escape)
-        m_renderer->getWindow().close();
+        m_renderer->close();
 }
 
 } // namespace tkd::States

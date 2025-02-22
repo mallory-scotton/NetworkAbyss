@@ -22,7 +22,7 @@ Engine::Engine(void)
 ///////////////////////////////////////////////////////////////////////////////
 void Engine::run(void)
 {
-    while (m_renderer->getWindow().isOpen()) {
+    while (m_renderer->isOpen()) {
         float deltaT = m_clock.restart().asSeconds();
 
         m_stateManager->handleEvents();
@@ -35,7 +35,7 @@ void Engine::run(void)
         m_renderer->display();
 
         if (m_stateManager->empty())
-            m_renderer->getWindow().close();
+            m_renderer->close();
     }
 }
 
