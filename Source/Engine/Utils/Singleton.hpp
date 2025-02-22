@@ -84,7 +84,7 @@ public:
         {
             m_instance.reset(new T());
         }
-        return m_instance.get();
+        return (m_instance.get());
     }
 };
 
