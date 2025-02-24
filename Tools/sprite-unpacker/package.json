@@ -5,7 +5,8 @@
   "description": "Little tools to unpack Unity sprites based on a folders",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts"
+    "unpack": "ts-node src/index.ts",
+    "organize": "ts-node src/organize.ts"
   },
   "keywords": [
     "unity",
